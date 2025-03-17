@@ -1,20 +1,15 @@
-use std::env;
+use std::{env, process::ExitCode};
 
-fn main() {
+fn main() -> ExitCode {
     // Argument parsing
     let args = env::args().collect::<Vec<String>>();
-    let (left_color, name, right_color);
-    match &args[..] {
-        [_, l, n, r] => {
-            left_color = l;
-            name = n;
-            right_color = r;
-        }
+    let (left_color, name, right_color) = match &args[..] {
+        [_, l, n, r] => (l, n, r),
         _ => {
             help();
-            return;
+            return ExitCode::FAILURE;
         }
-    }
+    };
 
     let left_color_num =
         u16::from_str_radix(left_color, 16).expect("lh_color: failed to parse u16");
@@ -24,7 +19,7 @@ fn main() {
     // really unsure if this is ever going to be run but just in case...
     if name.is_empty() {
         println!("Empty name string! I can't work with this!");
-        return;
+        return ExitCode::FAILURE;
     }
 
     // Parse individual colors from the numbers.
@@ -57,6 +52,8 @@ fn main() {
     }
 
     println!("{}", formatted_name);
+
+    ExitCode::SUCCESS
 }
 
 fn help() {
